@@ -11,7 +11,7 @@ declare global {
   interface User {
     mail: string;
     uuid: string;
-    cred: Credentials;
+    credentials: Credentials;
   }
 
   interface SocketServer extends HTTPServer {
@@ -29,5 +29,9 @@ declare global {
   interface Alexa {
     mail: string | undefined;
     uuid: string | undefined;
+  }
+
+  interface typeCheck {
+    [key: string]: 'string' | 'number' | 'boolean' | typeCheck;
   }
 }

@@ -16,14 +16,14 @@ export const generateAuthUrl = () => {
   });
 };
 
-const authorize = (user: User) => {
+export const authorize = (user: User) => {
   const oauth2Client = new google.auth.OAuth2(
     cred.web.client_id,
     cred.web.client_secret,
     cred.web.redirect_uris[0]
   );
 
-  oauth2Client.credentials = user.cred;
+  oauth2Client.setCredentials(user.credentials);
 
   google.options({ auth: oauth2Client });
 

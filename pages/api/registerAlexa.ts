@@ -15,9 +15,7 @@ const registerAlexa: NextApiHandler = async (req, res) => {
       //   return res.status(400).json({error: 'La cuenta ya existe en el servidor'});
       // }
 
-      const uuid = await (
-        await db.collection('users').insertOne(data)
-      ).insertedId;
+      const uuid = (await db.collection('users').insertOne(data)).insertedId;
 
       console.log(`Registered user with uuid ${uuid.toString()}`);
 

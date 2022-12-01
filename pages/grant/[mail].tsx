@@ -1,7 +1,6 @@
 import { GetServerSideProps } from 'next';
 import connect from 'lib/mongodb';
 import { generateAuthUrl } from 'lib/googleapis';
-import Queue from 'utils/Mutex';
 
 export default function GrantMail() {
   return (
