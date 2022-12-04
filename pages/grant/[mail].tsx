@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
     const db = await connect();
     const user = await db.collection('users').findOne({ mail: query.mail });
-    if (user === null || user.access_token) {
+    if (user === null) {
       return { props: {} };
     }
   } catch (error) {

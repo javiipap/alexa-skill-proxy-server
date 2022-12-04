@@ -1,4 +1,4 @@
-import { authorize } from 'lib/googleapis';
+import { authorize, runSecure } from 'lib/googleapis';
 import { NextApiHandler } from 'next';
 import connect from 'lib/mongodb';
 import { ObjectId } from 'mongodb';
@@ -16,9 +16,9 @@ const CalendarHandler: NextApiHandler = async (req, res) => {
       .findOne({ _id: new ObjectId(bearer) })) as unknown as User;
     const calendar = authorize(user).calendar('v3');
 
-    const { data } = await calendar.calendarList.list();
+    const { status, data } = await runSecure(calendar.calendarList.list());
 
-    return res.status(200).json({ calendars: data.items });
+    return res.status(status).json(data);
   }
 };
 

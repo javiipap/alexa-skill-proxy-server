@@ -1,5 +1,6 @@
 import cred from 'res/oauth-cred';
 import { google } from 'googleapis';
+import { GaxiosPromise } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
 export const generateAuthUrl = () => {
   const oauth2Client = new google.auth.OAuth2(
@@ -28,6 +29,50 @@ export const authorize = (user: User) => {
   google.options({ auth: oauth2Client });
 
   return google;
+};
+
+export const runSecure = async <T>(prom: GaxiosPromise<T>) => {
+  let data = undefined;
+  let status = 200;
+
+  try {
+    const res = await prom;
+    data = res.data;
+  } catch (e) {
+    const err = e as any;
+
+    if ('response' in err) {
+      status = err.response.code;
+      data = err.response.errors;
+    } else {
+      data = err;
+      status = 500;
+    }
+  }
+
+  return { status, data };
+};
+
+const _runSecure = async (query: () => Promise<any>) => {
+  let data = undefined;
+  let status = 200;
+
+  try {
+    const res = await query();
+    data = res.data;
+  } catch (e) {
+    const err = e as any;
+
+    if ('response' in err) {
+      status = err.response.code;
+      data = err.response.errors;
+    } else {
+      data = err;
+      status = 500;
+    }
+  }
+
+  return { status, data };
 };
 
 export const getCalendar = (user: User) => {

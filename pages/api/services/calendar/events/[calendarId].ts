@@ -1,5 +1,5 @@
 import connect from 'lib/mongodb';
-import { authorize } from 'lib/googleapis';
+import { authorize, runSecure } from 'lib/googleapis';
 import { ObjectId } from 'mongodb';
 import { NextApiHandler, NextApiRequest } from 'next';
 import checkTypeValidity from 'utils/checkTypeValidity';
@@ -48,43 +48,38 @@ const CalendarIdHandler: NextApiHandler = async (req, res) => {
     .findOne({ _id: new ObjectId(bearer) })) as unknown as User;
   const calendar = authorize(user).calendar('v3');
 
-  try {
-    if (req.method === 'GET') {
-      const tonight = new Date();
-      tonight.setHours(24, 0, 0, 0);
-      const dateBounds = {
-        timeMin: new Date().toISOString(),
-        timeMax: tonight.toISOString(),
-      };
+  if (req.method === 'GET') {
+    const tonight = new Date();
+    tonight.setHours(24, 0, 0, 0);
+    const dateBounds = {
+      timeMin: new Date().toISOString(),
+      timeMax: tonight.toISOString(),
+    };
 
-      const { data } = await calendar.events.list({
+    const { status, data } = await runSecure(
+      calendar.events.list({
         calendarId,
         ...dateBounds,
-      });
+      })
+    );
 
-      return res.status(200).json({ dateBounds, events: data });
-    } else if (req.method === 'POST') {
-      const { data } = await calendar.events.insert({
+    return res.status(status).json(data);
+  } else if (req.method === 'POST') {
+    const { status, data } = await runSecure(
+      calendar.events.insert({
         calendarId,
         requestBody: req.body,
-      });
-      return res.status(200).json({ inserted_event: data });
-    } else if (req.method === 'PUT') {
-      const { data } = await calendar.events.quickAdd({
+      })
+    );
+    return res.status(status).json(data);
+  } else if (req.method === 'PUT') {
+    const { status, data } = await runSecure(
+      calendar.events.quickAdd({
         calendarId,
         ...req.body,
-      });
-      return res.status(200).json({ inserted_event: data });
-    }
-    return res.status(201).end();
-  } catch (e) {
-    const error = e as any;
-    console.log(error);
-    if ('response' in error) {
-      return res.status(error.response.status).json({ error: error.response });
-    }
-
-    return res.status(500);
+      })
+    );
+    return res.status(status).json(data);
   }
 };
 

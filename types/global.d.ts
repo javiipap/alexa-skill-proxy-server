@@ -7,7 +7,6 @@ import type { Server as IOServer } from 'socket.io';
 export {};
 
 declare global {
-  var pendung: { [key: string]: Mutex };
   interface User {
     mail: string;
     uuid: string;
