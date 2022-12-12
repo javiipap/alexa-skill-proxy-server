@@ -7,14 +7,14 @@ const registerAlexa: NextApiHandler = async (req, res) => {
   }
 
   const data: Alexa = req.body;
-  if (data.device_uuid && data.user_uuid && Object.keys(data).length == 2) {
+  if (data.device && data.user && Object.keys(data).length == 2) {
     try {
       const db = await connect();
 
       if (
         db.collection('devices').findOne({
-          uuid: data.device_uuid,
-          session: { uuid: data.user_uuid },
+          uuid: data.device,
+          session: { uuid: data.user },
         }) === null
       ) {
         return res
@@ -24,29 +24,29 @@ const registerAlexa: NextApiHandler = async (req, res) => {
 
       const uuid = await db
         .collection('devices')
-        .findOne({ uuid: data.device_uuid });
+        .findOne({ uuid: data.device });
 
       if (!uuid) {
         await db
           .collection('devices')
-          .insertOne({ uuid: data.device_uuid, sessions: [] });
+          .insertOne({ uuid: data.device, sessions: [] });
       }
 
       await db.collection('devices').updateOne(
         {
-          uuid: data.device_uuid,
+          uuid: data.device,
         },
         {
           $push: {
             sessions: {
-              uuid: data.user_uuid,
+              uuid: data.user,
             },
           },
         }
       );
-      console.log(`Registered user with uuid ${data.user_uuid}`);
+      console.log(`Registered user with uuid ${data.user}`);
 
-      return res.status(200).json({ uuid: data.user_uuid });
+      return res.status(200).json({ uuid: data.user });
     } catch (error) {
       return res.status(500).json({ error });
     }

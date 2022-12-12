@@ -4,15 +4,15 @@ import connect from 'lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 const CalendarHandler: NextApiHandler = async (req, res) => {
-  const { user_id, device } = req.headers;
-  if (typeof user_id !== 'string' || typeof device !== 'string') {
+  const { user: user_id, device: device_id } = req.headers;
+  if (typeof user_id !== 'string' || typeof device_id !== 'string') {
     return res.status(401).end();
   }
 
   if (req.method === 'GET') {
     const db = await connect();
     const device = (await db.collection('devices').findOne({
-      uuid: user_id,
+      uuid: device_id,
       sessions: { uuid: user_id },
     })) as unknown as Device;
 

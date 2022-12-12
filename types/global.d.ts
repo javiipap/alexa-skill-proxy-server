@@ -31,8 +31,8 @@ declare global {
   }
 
   interface Alexa {
-    device_uuid: string | undefined;
-    user_uuid: string | undefined;
+    device: string | undefined;
+    user: string | undefined;
   }
 
   interface typeCheck {

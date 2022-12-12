@@ -27,12 +27,12 @@ const validTypes: { [key: string]: typeCheck } = {
 };
 
 const CalendarIdHandler: NextApiHandler = async (req, res) => {
-  const { bearer } = req.headers;
-  const { calendarId } = req.query;
-
-  if (typeof bearer !== 'string') {
+  const { user: user_id, device: device_id } = req.headers;
+  if (typeof user_id !== 'string' || typeof device_id !== 'string') {
     return res.status(401).end();
   }
+
+  const { calendarId } = req.query;
 
   if (typeof calendarId !== 'string') {
     return res.status(400).end();
@@ -43,9 +43,11 @@ const CalendarIdHandler: NextApiHandler = async (req, res) => {
   }
 
   const db = await connect();
-  const user = (await db
-    .collection('devices')
-    .findOne({ _id: new ObjectId(bearer) })) as unknown as User;
+  const device = (await db.collection('devices').findOne({
+    uuid: device_id,
+    sessions: { uuid: user_id },
+  }))! as unknown as Device;
+  const user = device.sessions.find((u) => u.uuid === user_id)!;
   const calendar = authorize(user).calendar('v3');
 
   if (req.method === 'GET') {
