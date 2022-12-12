@@ -13,6 +13,11 @@ declare global {
     credentials: Credentials;
   }
 
+  export interface Device {
+    uuid: string;
+    sessions: User[];
+  }
+
   interface SocketServer extends HTTPServer {
     io?: IOServer | undefined;
   }
@@ -26,8 +31,8 @@ declare global {
   }
 
   interface Alexa {
-    mail: string | undefined;
-    uuid: string | undefined;
+    device_uuid: string | undefined;
+    user_uuid: string | undefined;
   }
 
   interface typeCheck {

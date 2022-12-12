@@ -4,6 +4,7 @@ import { NextApiHandler } from 'next';
 import keys from 'res/oauth-cred';
 
 const GoogleCallback: NextApiHandler = async (req, res) => {
+  const [alexa_uuid, client_uuid] = (req.query.state as string).split('_');
   // Recibir token
   const oauth2Client = new google.auth.OAuth2(
     keys.web.client_id,
@@ -21,19 +22,22 @@ const GoogleCallback: NextApiHandler = async (req, res) => {
 
   // Guardar token
   const db = await connect();
-  await db.collection('users').updateOne(
-    { mail: data.email },
+  await db.collection('devices').updateOne(
+    { uuid: alexa_uuid, sessions: { uuid: client_uuid } },
     {
       $set: {
-        credentials: {
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
+        'sessions.$': {
+          mail: data.email,
+          uuid: client_uuid,
+          credentials: {
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+          },
         },
       },
     }
   );
 
-  // Confirmar a la alexa que está autorizada a través del socket.
   return res.status(200).end();
 };
 

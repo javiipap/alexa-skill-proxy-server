@@ -44,7 +44,7 @@ const CalendarIdHandler: NextApiHandler = async (req, res) => {
 
   const db = await connect();
   const user = (await db
-    .collection('users')
+    .collection('devices')
     .findOne({ _id: new ObjectId(bearer) })) as unknown as User;
   const calendar = authorize(user).calendar('v3');
 

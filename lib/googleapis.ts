@@ -2,7 +2,7 @@ import cred from 'res/oauth-cred';
 import { google } from 'googleapis';
 import { GaxiosPromise } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
-export const generateAuthUrl = () => {
+export const generateAuthUrl = (state: string) => {
   const oauth2Client = new google.auth.OAuth2(
     cred.web.client_id,
     cred.web.client_secret,
@@ -14,6 +14,7 @@ export const generateAuthUrl = () => {
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: scopes.join(' '),
+    state,
   });
 };
 

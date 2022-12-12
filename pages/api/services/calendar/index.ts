@@ -4,16 +4,24 @@ import connect from 'lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 const CalendarHandler: NextApiHandler = async (req, res) => {
-  const { bearer } = req.headers;
-  if (typeof bearer !== 'string') {
+  const { user_id, device } = req.headers;
+  if (typeof user_id !== 'string' || typeof device !== 'string') {
     return res.status(401).end();
   }
 
   if (req.method === 'GET') {
     const db = await connect();
-    const user = (await db
-      .collection('users')
-      .findOne({ _id: new ObjectId(bearer) })) as unknown as User;
+    const device = (await db.collection('devices').findOne({
+      uuid: user_id,
+      sessions: { uuid: user_id },
+    })) as unknown as Device;
+
+    const user = device.sessions.find((u) => u.uuid === user_id);
+
+    if (!user) {
+      return res.status(401).send('No se encontró el usuario.');
+    }
+
     const calendar = authorize(user).calendar('v3');
 
     const { status, data } = await runSecure(calendar.calendarList.list());
