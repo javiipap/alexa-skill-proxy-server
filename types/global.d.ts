@@ -7,7 +7,7 @@ import type { Server as IOServer } from 'socket.io';
 export {};
 
 declare global {
-  interface User {
+  export interface User {
     mail: string;
     uuid: string;
     credentials: Credentials;
