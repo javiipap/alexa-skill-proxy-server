@@ -13,7 +13,6 @@ const CalendarHandler: NextApiHandler = async (req, res) => {
     const db = await connect();
     const device = (await db.collection('devices').findOne({
       uuid: device_id,
-      sessions: { uuid: user_id },
     })) as unknown as Device;
 
     const user = device.sessions.find((u) => u.uuid === user_id);

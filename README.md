@@ -20,6 +20,4 @@ $ docker run -d -p 3000:3000 alexa-server alexa-skill-proxy-server
 ```
 
 ## Diagrama de flujo
-Algún día lo haré...
-
-![flowchart](res/flowchart.png)
+<div style="text-align:center;"><img src="doc/diagrama.svg"/></div>
